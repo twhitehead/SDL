@@ -36,7 +36,7 @@
 #define KEY_ALS_TOGGLE 0x230
 #endif
 
-extern int
+extern SDL_UDEV_deviceclass
 SDL_EVDEV_GuessDeviceClass(const unsigned long bitmask_ev[NBITS(EV_MAX)],
                            const unsigned long bitmask_abs[NBITS(ABS_MAX)],
                            const unsigned long bitmask_key[NBITS(KEY_MAX)],
@@ -54,7 +54,7 @@ SDL_EVDEV_GuessDeviceClass(const unsigned long bitmask_ev[NBITS(EV_MAX)],
         { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY }
     };
 
-    int devclass = 0;
+    SDL_UDEV_deviceclass devclass = 0;
     unsigned long keyboard_mask;
 
     /* X, Y, Z axes but no buttons probably means an accelerometer */

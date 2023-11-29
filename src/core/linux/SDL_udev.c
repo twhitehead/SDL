@@ -48,8 +48,8 @@ static SDL_bool SDL_UDEV_load_sym(const char *fn, void **addr);
 static int SDL_UDEV_load_syms(void);
 static SDL_bool SDL_UDEV_hotplug_update_available(void);
 static void get_caps(struct udev_device *dev, struct udev_device *pdev, const char *attr, unsigned long *bitmask, size_t bitmask_len);
-static int guess_device_class(struct udev_device *dev);
-static int device_class(struct udev_device *dev);
+static SDL_UDEV_deviceclass guess_device_class(struct udev_device *dev);
+static SDL_UDEV_deviceclass device_class(struct udev_device *dev);
 static void device_event(SDL_UDEV_deviceevent type, struct udev_device *dev);
 
 static SDL_bool SDL_UDEV_load_sym(const char *fn, void **addr)
@@ -225,7 +225,7 @@ void SDL_UDEV_Scan(void)
     _this->syms.udev_enumerate_unref(enumerate);
 }
 
-SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16 *product, Uint16 *version, int *class)
+SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16 *product, Uint16 *version, SDL_UDEV_deviceclass *class)
 {
     struct udev_enumerate *enumerate = NULL;
     struct udev_list_entry *devs = NULL;
@@ -253,7 +253,7 @@ SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16
 
             existing_path = _this->syms.udev_device_get_devnode(dev);
             if (existing_path && SDL_strcmp(device_path, existing_path) == 0) {
-                int class_temp;
+                SDL_UDEV_deviceclass class_temp;
                 found = SDL_TRUE;
 
                 val = _this->syms.udev_device_get_property_value(dev, "ID_VENDOR_ID");
@@ -374,7 +374,7 @@ static void get_caps(struct udev_device *dev, struct udev_device *pdev, const ch
     }
 }
 
-static int guess_device_class(struct udev_device *dev)
+static SDL_UDEV_deviceclass guess_device_class(struct udev_device *dev)
 {
     struct udev_device *pdev;
     unsigned long bitmask_ev[NBITS(EV_MAX)];
@@ -403,11 +403,11 @@ static int guess_device_class(struct udev_device *dev)
                                       &bitmask_rel[0]);
 }
 
-static int device_class(struct udev_device *dev)
+static SDL_UDEV_deviceclass device_class(struct udev_device *dev)
 {
     const char *subsystem;
     const char *val = NULL;
-    int devclass = 0;
+    SDL_UDEV_deviceclass devclass = 0;
 
     subsystem = _this->syms.udev_device_get_subsystem(dev);
     if (!subsystem) {

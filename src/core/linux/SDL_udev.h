@@ -46,6 +46,22 @@ typedef enum
     SDL_UDEV_DEVICEREMOVED
 } SDL_UDEV_deviceevent;
 
+/**
+ *  Device class (can be any comination of these)
+ */
+
+typedef enum
+{
+    SDL_UDEV_DEVICE_UNKNOWN = 0x0000,
+    SDL_UDEV_DEVICE_MOUSE = 0x0001,
+    SDL_UDEV_DEVICE_KEYBOARD = 0x0002,
+    SDL_UDEV_DEVICE_JOYSTICK = 0x0004,
+    SDL_UDEV_DEVICE_SOUND = 0x0008,
+    SDL_UDEV_DEVICE_TOUCHSCREEN = 0x0010,
+    SDL_UDEV_DEVICE_ACCELEROMETER = 0x0020,
+    SDL_UDEV_DEVICE_TOUCHPAD = 0x0040
+} SDL_UDEV_deviceclass;
+
 typedef void (*SDL_UDEV_Callback)(SDL_UDEV_deviceevent udev_type, int udev_class, const char *devpath);
 
 typedef struct SDL_UDEV_CallbackList
@@ -103,7 +119,7 @@ extern void SDL_UDEV_UnloadLibrary(void);
 extern int SDL_UDEV_LoadLibrary(void);
 extern void SDL_UDEV_Poll(void);
 extern void SDL_UDEV_Scan(void);
-extern SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16 *product, Uint16 *version, int *class);
+extern SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16 *product, Uint16 *version, SDL_UDEV_deviceclass *class);
 extern int SDL_UDEV_AddCallback(SDL_UDEV_Callback cb);
 extern void SDL_UDEV_DelCallback(SDL_UDEV_Callback cb);
 extern const SDL_UDEV_Symbols *SDL_UDEV_GetUdevSyms(void);

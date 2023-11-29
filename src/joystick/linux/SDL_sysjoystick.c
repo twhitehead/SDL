@@ -260,7 +260,7 @@ static int IsJoystick(const char *path, int fd, char **name_return, SDL_Joystick
     struct input_id inpid;
     char *name;
     char product_string[128];
-    int class = 0;
+    SDL_UDEV_deviceclass class = 0;
 
     SDL_zero(inpid);
 #ifdef SDL_USE_LIBUDEV
