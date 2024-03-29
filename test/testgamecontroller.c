@@ -800,6 +800,8 @@ int main(int argc, char *argv[])
     int controller_index = 0;
     char guid[64];
 
+    SDL_Delay(30000);
+
     SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
     SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
     SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
@@ -953,9 +955,9 @@ int main(int argc, char *argv[])
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(loop, NULL, 0, 1);
 #else
-    while (!done) {
-        loop(NULL);
-    }
+    //while (!done) {
+    //    loop(NULL);
+    //}
 #endif
 
     /* Reset trigger state */
@@ -967,6 +969,9 @@ int main(int argc, char *argv[])
     CloseVirtualController();
     SDL_DestroyRenderer(screen);
     SDL_DestroyWindow(window);
+
+    SDL_Delay(30000);
+
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
     return 0;

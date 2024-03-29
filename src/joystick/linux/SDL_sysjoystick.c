@@ -281,10 +281,14 @@ static int IsJoystick(const char *path, int *fd, char **name_return, Uint16 *ven
     int class = 0;
 
     SDL_zero(inpid);
+    SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick");
 #ifdef SDL_USE_LIBUDEV
     /* Opening input devices can generate synchronous device I/O, so avoid it if we can */
+    SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> SDL_UDEV_GetProductInfo");
+    SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> SDL_UDEV_GetProductInfo");
     SDL_UDEV_GetProductInfo(path, &inpid.vendor, &inpid.product, &inpid.version, &class);
     if (!(class & SDL_UDEV_DEVICE_JOYSTICK)) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> out SDL_UDEV_GetProductInfo");
         return 0;
     }
 #endif
@@ -293,21 +297,26 @@ static int IsJoystick(const char *path, int *fd, char **name_return, Uint16 *ven
         *fd = open(path, O_RDONLY | O_CLOEXEC, 0);
     }
     if (!fd || *fd < 0) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> out on opening device");
         return 0;
     }
 
     if (ioctl(*fd, JSIOCGNAME(sizeof(product_string)), product_string) <= 0) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> ioctl failed");
         /* When udev enumeration or classification, we only got joysticks here, so no need to test */
         if (enumeration_method != ENUMERATION_LIBUDEV && !class && !GuessIsJoystick(*fd)) {
+            SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> out on GuessIsJoystick");
             return 0;
         }
 
         /* Could have vendor and product already from udev, but should agree with evdev */
         if (ioctl(*fd, EVIOCGID, &inpid) < 0) {
+            SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> out on EVIOCGID");
             return 0;
         }
 
         if (ioctl(*fd, EVIOCGNAME(sizeof(product_string)), product_string) < 0) {
+            SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsJoystick -> out on EVIOCGNAME");
             return 0;
         }
     }
@@ -350,10 +359,13 @@ static int IsSensor(const char *path, int *fd)
     int class = 0;
 
     SDL_zero(inpid);
+    SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSenser");
 #ifdef SDL_USE_LIBUDEV
     /* Opening input devices can generate synchronous device I/O, so avoid it if we can */
+    SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSenser -> SDL_UDEV_GetProductInfo");
     SDL_UDEV_GetProductInfo(path, &inpid.vendor, &inpid.product, &inpid.version, &class);
     if (!(class & SDL_UDEV_DEVICE_ACCELEROMETER)) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSensor -> out SDL_UDEV_GetProductInfo");
         return 0;
     }
 #endif
@@ -362,18 +374,22 @@ static int IsSensor(const char *path, int *fd)
         *fd = open(path, O_RDONLY | O_CLOEXEC, 0);
     }
     if (!fd || *fd < 0) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSensor -> out on opening device");
         return 0;
     }
 
     if (!class && !GuessIsSensor(*fd)) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSensor -> out on GuessIsSensor");
         return 0;
     }
 
     if (ioctl(*fd, EVIOCGID, &inpid) < 0) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSensor -> out on EVIOCGID");
         return 0;
     }
 
     if (inpid.vendor == USB_VENDOR_NINTENDO && inpid.product == USB_PRODUCT_NINTENDO_WII_REMOTE) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "IsSensor -> out on USB_PRODUCT_NINTENDO_WII_REMOTE");
         /* Wii extension controls */
         /* These may create 3 sensor devices but we only support reading from 1: ignore them */
         return 0;
@@ -1004,15 +1020,18 @@ static void LINUX_JoystickDetect(void)
 {
 #ifdef SDL_USE_LIBUDEV
     if (enumeration_method == ENUMERATION_LIBUDEV) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "LINUX_JoystickDetect -> SDL_UDEV_Poll");
         SDL_UDEV_Poll();
     } else
 #endif
 #ifdef HAVE_INOTIFY
         if (inotify_fd >= 0 && last_joy_detect_time != 0) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "LINUX_JoystickDetect -> LINUX_InotifyJoystickDetect");
         LINUX_InotifyJoystickDetect();
     } else
 #endif
     {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "LINUX_JoystickDetect -> LINUX_FallbackJoystickDetect");
         LINUX_FallbackJoystickDetect();
     }
 

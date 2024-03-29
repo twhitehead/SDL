@@ -235,10 +235,12 @@ SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16
     int class_temp;
 
     if (!_this) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "SDL_UDEV_GetProductInfo -> out on _this");
         return SDL_FALSE;
     }
 
     if (stat(device_path, &statbuf) == -1) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "SDL_UDEV_GetProductInfo -> out on stat");
         return SDL_FALSE;
     }
 
@@ -249,12 +251,14 @@ SDL_bool SDL_UDEV_GetProductInfo(const char *device_path, Uint16 *vendor, Uint16
         type = 'c';
     }
     else {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "SDL_UDEV_GetProductInfo -> out on st_mode");
         return SDL_FALSE;
     }
 
     dev = _this->syms.udev_device_new_from_devnum(_this->udev, type, statbuf.st_rdev);
 
     if (!dev) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_INPUT, "SDL_UDEV_GetProductInfo -> out on dev");
         return SDL_FALSE;
     }
 
